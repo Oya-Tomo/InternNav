@@ -18,3 +18,47 @@ markers = [
   "slow: marks tests as slow",
   "gpu: requires GPU"
 ]
+
+# `uv sync` builds the Habitat (VLN-CE) evaluation environment, matching the
+# "Install with Habitat Environment" guide: Python 3.9, habitat-sim/lab 0.2.4,
+# and PyTorch 2.6.0 with CUDA 12.4. setup.py still defines the internnav package.
+[dependency-groups]
+habitat = [
+  "internnav",
+  "habitat-sim==0.2.4",
+  "habitat-lab==0.2.4",
+  "habitat-baselines==0.2.4",
+  "torch==2.6.0",
+  "torchvision==0.21.0",
+  # requirements/habitat_requirements.txt without flash_attn, which only
+  # InternVLA-N1 inference needs and which compiles from source.
+  "accelerate==1.4.0",
+  "depth-camera-filtering @ git+https://github.com/naokiyokoyama/depth_camera_filtering.git",
+  "diffusers==0.32.2",
+  "diffusion-policy @ git+https://github.com/real-stanford/diffusion_policy.git@5ba07ac6661db573af695b419a7947ecb704690f",
+  "ftfy==6.3.1",
+  "transformers==4.51.0",
+  "dtw==1.4.0",
+]
+
+[tool.uv]
+default-groups = ["habitat"]
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.9'"]
+python-preference = "only-managed"
+
+[tool.uv.dependency-groups]
+habitat = { requires-python = "==3.9.*" }
+
+[tool.uv.sources]
+internnav = { path = ".", editable = true }
+# No Linux wheels exist for habitat-sim; this repacks the official conda build.
+habitat-sim = { path = "packaging/habitat-sim" }
+habitat-lab = { git = "https://github.com/facebookresearch/habitat-lab.git", tag = "v0.2.4", subdirectory = "habitat-lab" }
+habitat-baselines = { git = "https://github.com/facebookresearch/habitat-lab.git", tag = "v0.2.4", subdirectory = "habitat-baselines" }
+torch = { index = "pytorch-cu124" }
+torchvision = { index = "pytorch-cu124" }
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true

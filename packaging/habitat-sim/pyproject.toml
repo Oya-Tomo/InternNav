@@ -1,0 +1,10 @@
+# habitat-sim 0.2.4 (headless, Bullet) as a wheel, repacked from the official conda build.
+# repack.py holds the metadata and the pinned conda archive; see its docstring for why.
+[build-system]
+requires = []
+build-backend = "repack"
+backend-path = ["."]
+
+[project]
+name = "habitat-sim"
+dynamic = ["version", "description", "license", "requires-python", "dependencies"]
